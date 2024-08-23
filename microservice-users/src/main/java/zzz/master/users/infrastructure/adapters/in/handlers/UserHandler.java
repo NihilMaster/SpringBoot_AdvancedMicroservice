@@ -5,8 +5,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import zzz.master.users.domain.models.UserStatusEnum;
 import zzz.master.users.infrastructure.adapters.out.repositories.UserRepository;
 import zzz.master.users.infrastructure.entities.UserEntity;
+
+import java.util.Arrays;
 
 @Component
 public class UserHandler {
@@ -24,6 +27,12 @@ public class UserHandler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> getUserStatus(ServerRequest serverRequest) {
+        return userRepository.findById(serverRequest.pathVariable("id"))
+                .flatMap(user -> ServerResponse.ok().bodyValue(user.getStatus()))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> createUser(ServerRequest serverRequest) {
         return serverRequest
                 .bodyToMono(UserEntity.class)
@@ -34,7 +43,7 @@ public class UserHandler {
 
     public Mono<ServerResponse> updateUser(ServerRequest serverRequest) {
         return userRepository.findById(serverRequest.pathVariable("id"))
-                .flatMap(existingContact -> serverRequest.bodyToMono(UserEntity.class)
+                .flatMap(existingUser -> serverRequest.bodyToMono(UserEntity.class)
                         .flatMap(userEntity -> {
                             userEntity.setId(serverRequest.pathVariable("id")); // Asegurar que el ID sea el mismo
                             return userRepository.save(userEntity);
@@ -43,10 +52,29 @@ public class UserHandler {
                 )
                 .switchIfEmpty(ServerResponse.notFound().build()); // Si no se encuentra el contacto
     }
+    
+    public Mono<ServerResponse> updateUserStatus(ServerRequest serverRequest) {
+        return userRepository.findById(serverRequest.pathVariable("id"))
+                .flatMap(existingUser -> {
+                    if(existingUser.getStatus().name().equals(serverRequest.pathVariable("status"))){
+                        return ServerResponse.ok().bodyValue("The status is the same");
+                    }
+                    if (Arrays.stream(UserStatusEnum.values())
+                            .anyMatch(e -> e.name().equalsIgnoreCase(serverRequest.pathVariable("status")))) {
+                        existingUser.setStatus(UserStatusEnum.valueOf(serverRequest.pathVariable("status")));
+                        return userRepository.save(existingUser)
+                                .flatMap(updatedContact -> ServerResponse.ok().bodyValue(updatedContact));
+                    }else{
+                        return ServerResponse.badRequest().bodyValue("Invalid status: "
+                                +serverRequest.pathVariable("status"));
+                    }
+                })
+                .switchIfEmpty(ServerResponse.notFound().build()); // Si no se encuentra el contacto
+    }
 
     public Mono<ServerResponse> deleteUser(ServerRequest serverRequest) {
         return userRepository.findById(serverRequest.pathVariable("id"))
-                .flatMap(existingContact -> userRepository.delete(existingContact)
+                .flatMap(existingUser -> userRepository.delete(existingUser)
                         .then(ServerResponse.noContent().build()))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }

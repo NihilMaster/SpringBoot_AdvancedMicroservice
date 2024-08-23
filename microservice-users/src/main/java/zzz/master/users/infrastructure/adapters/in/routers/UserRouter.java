@@ -16,8 +16,10 @@ public class UserRouter {
                 .route()
                 .GET("/api/users", userHandler::getAll)
                 .GET("/api/user/{id}", userHandler::getById)
+                .GET("/api/user/{id}/status", userHandler::getUserStatus)
                 .POST("/api/user", userHandler::createUser)
                 .PUT("/api/user/{id}", userHandler::updateUser)
+                .PUT("/api/user/{id}/status/{status}", userHandler::updateUserStatus)
                 .DELETE("/api/user/{id}", userHandler::deleteUser)
                 .build();
     }

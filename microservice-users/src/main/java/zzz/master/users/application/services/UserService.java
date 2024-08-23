@@ -2,6 +2,7 @@ package zzz.master.users.application.services;
 
 import org.springframework.stereotype.Service;
 import zzz.master.users.domain.models.UserModel;
+import zzz.master.users.domain.models.UserStatusEnum;
 import zzz.master.users.domain.ports.in.CreateUserUseCase;
 import zzz.master.users.domain.ports.in.DeleteUserUseCase;
 import zzz.master.users.domain.ports.in.RetrieveUserUseCase;
@@ -44,7 +45,17 @@ public class UserService implements CreateUserUseCase, DeleteUserUseCase, Update
     }
 
     @Override
+    public UserStatusEnum getUserStatus(Long userId) {
+        return retrieveUserUseCase.getUser(userId).get().getStatus();
+    }
+
+    @Override
     public Optional<UserModel> updateUser(UserModel userModel) {
         return updateUserUseCase.updateUser(userModel);
+    }
+
+    @Override
+    public UserStatusEnum updateUserStatus(Long userId, UserStatusEnum userStatusEnum) {
+        return updateUserUseCase.updateUserStatus(userId, userStatusEnum);
     }
 }

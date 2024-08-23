@@ -1,6 +1,7 @@
 package zzz.master.users.application.usercasesIMPL;
 
 import zzz.master.users.domain.models.UserModel;
+import zzz.master.users.domain.models.UserStatusEnum;
 import zzz.master.users.domain.ports.in.RetrieveUserUseCase;
 import zzz.master.users.domain.ports.out.UserRepositoryPort;
 
@@ -23,5 +24,10 @@ public class RetrieveUserUseCaseIMPL implements RetrieveUserUseCase {
     @Override
     public List<UserModel> getAllUsers() {
         return userRepositoryPort.getAllUsers();
+    }
+
+    @Override
+    public UserStatusEnum getUserStatus(Long userId) {
+        return userRepositoryPort.getUserStatus(userId);
     }
 }
