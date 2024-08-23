@@ -44,6 +44,32 @@ public class BookHandler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> updateAvailability(ServerRequest serverRequest) {
+        return bookRepository.findById(Long.valueOf(serverRequest.pathVariable("id")))
+                .flatMap(existingBook -> {
+                    if(existingBook.getAvailableCopies().equals(Integer.valueOf(serverRequest.pathVariable("availability")))) {
+                        return ServerResponse.ok().bodyValue("The availability is the same");
+                    }
+                    existingBook.setAvailableCopies(Integer.valueOf(serverRequest.pathVariable("availability")));
+                    return bookRepository.save(existingBook)
+                            .flatMap(updatedBook -> ServerResponse.ok().bodyValue(updatedBook));
+                })
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> updateTotalCopies(ServerRequest serverRequest) {
+        return bookRepository.findById(Long.valueOf(serverRequest.pathVariable("id")))
+                .flatMap(existingBook -> {
+                    if(existingBook.getTotalCopies().equals(Integer.valueOf(serverRequest.pathVariable("copies")))) {
+                        return ServerResponse.ok().bodyValue("The total copies are the same");
+                    }
+                    existingBook.setTotalCopies(Integer.valueOf(serverRequest.pathVariable("copies")));
+                    return bookRepository.save(existingBook)
+                            .flatMap(updatedBook -> ServerResponse.ok().bodyValue(updatedBook));
+                })
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> deleteBook(ServerRequest serverRequest) {
         return bookRepository.findById(Long.valueOf(serverRequest.pathVariable("id")))
                 .flatMap(existingBook -> bookRepository.delete(existingBook)

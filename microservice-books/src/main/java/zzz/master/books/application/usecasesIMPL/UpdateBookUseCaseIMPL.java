@@ -5,6 +5,7 @@ import zzz.master.books.domain.ports.in.UpdateBookUseCase;
 import zzz.master.books.domain.ports.out.BookRepositoryPort;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 
 public class UpdateBookUseCaseIMPL implements UpdateBookUseCase {
 
@@ -17,5 +18,15 @@ public class UpdateBookUseCaseIMPL implements UpdateBookUseCase {
     @Override
     public Optional<BookModel> updateBook(BookModel book) {
         return bookRepositoryPort.updateBook(book);
+    }
+
+    @Override
+    public OptionalInt updateAvailableCopies(Long bookId, Integer availableCopies) {
+        return bookRepositoryPort.updateAvailableCopies(bookId, availableCopies);
+    }
+
+    @Override
+    public OptionalInt updateTotalCopies(Long bookId, Integer totalCopies) {
+        return bookRepositoryPort.updateTotalCopies(bookId, totalCopies);
     }
 }

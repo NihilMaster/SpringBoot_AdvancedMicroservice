@@ -18,6 +18,8 @@ public class BookRouter {
                 .GET("/api/book/{id}", bookHandler::getById)
                 .POST("/api/book", bookHandler::createBook)
                 .PUT("/api/book/{id}", bookHandler::updateBook)
+                .PUT("/api/book/{id}/availability-copies/{availability}", bookHandler::updateAvailability)
+                .PUT("/api/book/{id}/total-copies/{copies}", bookHandler::updateTotalCopies)
                 .DELETE("/api/book/{id}", bookHandler::deleteBook)
                 .build();
     }

@@ -8,6 +8,7 @@ import zzz.master.books.domain.ports.in.UpdateBookUseCase;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 public class BookService implements CreateBookUseCase, UpdateBookUseCase, DeleteBookUseCase, RetrieveBookUseCase {
 
@@ -41,6 +42,16 @@ public class BookService implements CreateBookUseCase, UpdateBookUseCase, Delete
     @Override
     public Optional<BookModel> updateBook(BookModel book) {
         return updateBookUseCase.updateBook(book);
+    }
+
+    @Override
+    public OptionalInt updateAvailableCopies(Long bookId, Integer availableCopies) {
+        return updateBookUseCase.updateAvailableCopies(bookId, availableCopies);
+    }
+
+    @Override
+    public OptionalInt updateTotalCopies(Long bookId, Integer totalCopies) {
+        return updateBookUseCase.updateTotalCopies(bookId, totalCopies);
     }
 
     @Override
