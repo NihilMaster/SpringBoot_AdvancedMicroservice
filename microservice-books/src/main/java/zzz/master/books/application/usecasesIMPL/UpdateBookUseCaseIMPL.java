@@ -29,4 +29,9 @@ public class UpdateBookUseCaseIMPL implements UpdateBookUseCase {
     public OptionalInt updateTotalCopies(Long bookId, Integer totalCopies) {
         return bookRepositoryPort.updateTotalCopies(bookId, totalCopies);
     }
+
+    @Override
+    public OptionalInt updateLoanCount(Long bookId, Integer loanCount) {
+        return bookRepositoryPort.updateLoanCount(bookId, loanCount);
+    }
 }

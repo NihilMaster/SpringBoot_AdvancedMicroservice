@@ -55,6 +55,11 @@ public class BookService implements CreateBookUseCase, UpdateBookUseCase, Delete
     }
 
     @Override
+    public OptionalInt updateLoanCount(Long bookId, Integer loanCount) {
+        return updateBookUseCase.updateLoanCount(bookId, loanCount);
+    }
+
+    @Override
     public boolean deleteBook(Long bookId) {
         return deleteBookUseCase.deleteBook(bookId);
     }

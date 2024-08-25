@@ -70,6 +70,19 @@ public class BookHandler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> updateLoanCount(ServerRequest serverRequest) {
+        return bookRepository.findById(Long.valueOf(serverRequest.pathVariable("id")))
+                .flatMap(existingBook -> {
+                    if(existingBook.getLoanCount().equals(Integer.valueOf(serverRequest.pathVariable("count")))) {
+                        return ServerResponse.ok().bodyValue("The loan count is the same");
+                    }
+                    existingBook.setLoanCount(Integer.valueOf(serverRequest.pathVariable("count")));
+                    return bookRepository.save(existingBook)
+                            .flatMap(updatedBook -> ServerResponse.ok().bodyValue(updatedBook));
+                })
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> deleteBook(ServerRequest serverRequest) {
         return bookRepository.findById(Long.valueOf(serverRequest.pathVariable("id")))
                 .flatMap(existingBook -> bookRepository.delete(existingBook)

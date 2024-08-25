@@ -10,4 +10,5 @@ public interface UpdateBookUseCase {
     Optional<BookModel> updateBook(BookModel book);
     OptionalInt updateAvailableCopies(Long bookId, Integer availableCopies);
     OptionalInt updateTotalCopies(Long bookId, Integer totalCopies);
+    OptionalInt updateLoanCount(Long bookId, Integer loanCount);
 }

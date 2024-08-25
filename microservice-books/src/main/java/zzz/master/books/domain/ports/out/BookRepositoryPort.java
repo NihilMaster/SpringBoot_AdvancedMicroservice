@@ -14,5 +14,6 @@ public interface BookRepositoryPort {
     Optional<BookModel> updateBook(BookModel bookModel);
     OptionalInt updateAvailableCopies(Long bookId, Integer availableCopies);
     OptionalInt updateTotalCopies(Long bookId, Integer totalCopies);
+    OptionalInt updateLoanCount(Long bookId, Integer loanCount);
     boolean deleteBook(Long bookId);
 }
