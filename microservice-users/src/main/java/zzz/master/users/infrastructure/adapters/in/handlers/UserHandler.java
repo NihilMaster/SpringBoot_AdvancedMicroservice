@@ -33,6 +33,12 @@ public class UserHandler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> getMaxLoansAllowed(ServerRequest serverRequest) {
+        return userRepository.findById(serverRequest.pathVariable("id"))
+                .flatMap(user -> ServerResponse.ok().bodyValue(user.getMaxLoansAllowed()))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
     public Mono<ServerResponse> createUser(ServerRequest serverRequest) {
         return serverRequest
                 .bodyToMono(UserEntity.class)
@@ -69,6 +75,35 @@ public class UserHandler {
                                 +serverRequest.pathVariable("status"));
                     }
                 })
+                .switchIfEmpty(ServerResponse.notFound().build()); // Si no se encuentra el contacto
+    }
+
+    public Mono<ServerResponse> updateLoanCount(ServerRequest serverRequest) {
+        return userRepository.findById(serverRequest.pathVariable("id"))
+                .flatMap(existingUser -> {
+                        System.out.println(existingUser.toString());
+                        existingUser.setLoanCount(serverRequest.pathVariable("count").equals("null") ?
+                                existingUser.getLoanCount() :
+                                Integer.valueOf(serverRequest.pathVariable("count")));
+                        return userRepository.save(existingUser)
+                                .flatMap(updatedContact -> ServerResponse.ok()
+                                        .bodyValue(updatedContact.getLoanCount()));
+                    }
+                )
+                .switchIfEmpty(ServerResponse.notFound().build()); // Si no se encuentra el contacto
+    }
+
+    public Mono<ServerResponse> updateMaxLoansAllowed(ServerRequest serverRequest) {
+        return userRepository.findById(serverRequest.pathVariable("id"))
+                .flatMap(existingUser -> {
+                        existingUser.setMaxLoansAllowed(serverRequest.pathVariable("max").equals("null") ?
+                                existingUser.getMaxLoansAllowed() :
+                                Integer.valueOf(serverRequest.pathVariable("max")));
+                        return userRepository.save(existingUser)
+                                .flatMap(updatedContact -> ServerResponse.ok()
+                                        .bodyValue(updatedContact.getMaxLoansAllowed()));
+                        }
+                )
                 .switchIfEmpty(ServerResponse.notFound().build()); // Si no se encuentra el contacto
     }
 

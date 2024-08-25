@@ -24,4 +24,14 @@ public class UpdateUserUseCaseIMPL implements UpdateUserUseCase {
     public UserStatusEnum updateUserStatus(Long userId, UserStatusEnum userStatusEnum) {
         return userRepositoryPort.updateUserStatus(userId, userStatusEnum);
     }
+
+    @Override
+    public Integer updateLoanCount(Long userId, Integer loanCount) {
+        return userRepositoryPort.updateLoanCount(userId, loanCount);
+    }
+
+    @Override
+    public Integer updateMaxLoansAllowed(Long userId, Integer maxLoansAllowed) {
+        return userRepositoryPort.updateMaxLoansAllowed(userId, maxLoansAllowed);
+    }
 }

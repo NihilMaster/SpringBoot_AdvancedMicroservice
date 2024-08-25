@@ -11,4 +11,5 @@ public interface RetrieveUserUseCase {
     Optional<UserModel> getUser(Long userId);
     List<UserModel> getAllUsers();
     UserStatusEnum getUserStatus(Long userId);
+    Integer getMaxLoansAllowed(Long userId);
 }

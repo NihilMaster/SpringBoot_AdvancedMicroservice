@@ -30,4 +30,9 @@ public class RetrieveUserUseCaseIMPL implements RetrieveUserUseCase {
     public UserStatusEnum getUserStatus(Long userId) {
         return userRepositoryPort.getUserStatus(userId);
     }
+
+    @Override
+    public Integer getMaxLoansAllowed(Long userId) {
+        return userRepositoryPort.getMaxLoansAllowed(userId);
+    }
 }

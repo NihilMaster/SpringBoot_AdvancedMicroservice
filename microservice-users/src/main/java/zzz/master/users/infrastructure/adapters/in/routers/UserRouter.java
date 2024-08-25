@@ -17,9 +17,12 @@ public class UserRouter {
                 .GET("/api/users", userHandler::getAll)
                 .GET("/api/user/{id}", userHandler::getById)
                 .GET("/api/user/{id}/status", userHandler::getUserStatus)
+                .GET("/api/user/{id}/max-loans-allowed", userHandler::getMaxLoansAllowed)
                 .POST("/api/user", userHandler::createUser)
                 .PUT("/api/user/{id}", userHandler::updateUser)
                 .PUT("/api/user/{id}/status/{status}", userHandler::updateUserStatus)
+                .PUT("/api/user/{id}/loans-count/{count}", userHandler::updateLoanCount)
+                .PUT("/api/user/{id}/max-loans-allowed/{max}", userHandler::updateMaxLoansAllowed)
                 .DELETE("/api/user/{id}", userHandler::deleteUser)
                 .build();
     }

@@ -1,6 +1,5 @@
 package zzz.master.users.application.services;
 
-import org.springframework.stereotype.Service;
 import zzz.master.users.domain.models.UserModel;
 import zzz.master.users.domain.models.UserStatusEnum;
 import zzz.master.users.domain.ports.in.CreateUserUseCase;
@@ -46,7 +45,12 @@ public class UserService implements CreateUserUseCase, DeleteUserUseCase, Update
 
     @Override
     public UserStatusEnum getUserStatus(Long userId) {
-        return retrieveUserUseCase.getUser(userId).get().getStatus();
+        return retrieveUserUseCase.getUserStatus(userId);
+    }
+
+    @Override
+    public Integer getMaxLoansAllowed(Long userId) {
+        return retrieveUserUseCase.getMaxLoansAllowed(userId);
     }
 
     @Override
@@ -57,5 +61,15 @@ public class UserService implements CreateUserUseCase, DeleteUserUseCase, Update
     @Override
     public UserStatusEnum updateUserStatus(Long userId, UserStatusEnum userStatusEnum) {
         return updateUserUseCase.updateUserStatus(userId, userStatusEnum);
+    }
+
+    @Override
+    public Integer updateLoanCount(Long userId, Integer loanCount) {
+        return updateUserUseCase.updateLoanCount(userId, loanCount);
+    }
+
+    @Override
+    public Integer updateMaxLoansAllowed(Long userId, Integer maxLoansAllowed) {
+        return updateUserUseCase.updateMaxLoansAllowed(userId, maxLoansAllowed);
     }
 }

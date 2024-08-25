@@ -9,4 +9,6 @@ public interface UpdateUserUseCase {
 
     Optional<UserModel> updateUser(UserModel userModel);
     UserStatusEnum updateUserStatus(Long userId, UserStatusEnum userStatusEnum);
+    Integer updateLoanCount(Long userId, Integer loanCount);
+    Integer updateMaxLoansAllowed(Long userId, Integer maxLoansAllowed);
 }
