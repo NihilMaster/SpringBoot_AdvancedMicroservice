@@ -52,7 +52,7 @@ public class BookHandler {
                     }
                     existingBook.setAvailableCopies(Integer.valueOf(serverRequest.pathVariable("availability")));
                     return bookRepository.save(existingBook)
-                            .flatMap(updatedBook -> ServerResponse.ok().bodyValue(updatedBook));
+                            .flatMap(updatedBook -> ServerResponse.ok().bodyValue(updatedBook.getAvailableCopies()));
                 })
                 .switchIfEmpty(ServerResponse.notFound().build());
     }

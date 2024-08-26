@@ -1,5 +1,6 @@
 package zzz.master.loans.infrastructure.adapters.out.clients;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -9,7 +10,7 @@ public class UserService {
 
     private final WebClient webClient;
 
-    public UserService(WebClient webClient) {
+    public UserService(@Qualifier("webClientUser") WebClient webClient) {
         this.webClient = webClient;
     }
 

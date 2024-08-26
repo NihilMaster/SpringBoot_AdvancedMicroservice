@@ -6,9 +6,13 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import zzz.master.loans.domain.models.LoanStatusEnum;
+import zzz.master.loans.infrastructure.adapters.out.clients.BookService;
 import zzz.master.loans.infrastructure.adapters.out.clients.UserService;
 import zzz.master.loans.infrastructure.adapters.out.repositories.LoanRepository;
 import zzz.master.loans.infrastructure.entities.LoanEntity;
+
+import java.time.LocalDate;
 
 @Repository
 public class LoanHandler {
@@ -18,6 +22,9 @@ public class LoanHandler {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private BookService bookService;
 
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         return ServerResponse.ok().body(loanRepository.findAll(), LoanEntity.class);
@@ -44,16 +51,25 @@ public class LoanHandler {
                                 return userService.getUserMaxLoansAllowedById(loanEntity.getUserId())
                                         .flatMap(userMaxLoans -> {
                                             if (userStatus.equals("\"ACTIVE\"") && userMaxLoans > 0) {
-                                                // GetBookById
-                                                return loanRepository.save(loanEntity)
-                                                        .flatMap(loanSaved -> {
-                                                            return userService.getUserLoanCount(loanSaved.getUserId())
-                                                                    .flatMap(userLoanCount -> {
-                                                                        return userService.updateUserLoanCount(loanSaved.getUserId(),userLoanCount)
-                                                                                .flatMap(loan -> ServerResponse.ok().bodyValue(loanSaved));
-                                                                    });
-                                                        })
-                                                        .switchIfEmpty(ServerResponse.notFound().build());
+                                                return bookService.getBookById(loanEntity.getBookId())
+                                                        .flatMap(book -> {
+                                                            if(book.getAvailableCopies() > 0) {
+                                                                loanEntity.setLoanDate(LocalDate.now());
+                                                                loanEntity.setDueDate(loanEntity.getLoanDate().plusDays(10));
+                                                                loanEntity.setStatus(LoanStatusEnum.ACTIVE);
+                                                                return loanRepository.save(loanEntity)
+                                                                        .flatMap(loanSaved -> {
+                                                                            return userService.getUserLoanCount(loanSaved.getUserId())
+                                                                                    .flatMap(userLoanCount -> {
+                                                                                        return userService.updateUserLoanCount(loanSaved.getUserId(),userLoanCount)
+                                                                                                .flatMap(userLoan ->  bookService.updateBookAvailableCopies(loanSaved.getBookId(), book.getAvailableCopies() - 1)
+                                                                                                            .flatMap(bookUpdated -> ServerResponse.ok().bodyValue(loanSaved)));
+                                                                                    });
+                                                                        })
+                                                                        .switchIfEmpty(ServerResponse.notFound().build());
+                                                            }
+                                                            return ServerResponse.badRequest().bodyValue("No hay libros disponibles");
+                                                        }).switchIfEmpty(ServerResponse.notFound().build());
                                             } else {
                                                 return ServerResponse.notFound().build();
                                             }

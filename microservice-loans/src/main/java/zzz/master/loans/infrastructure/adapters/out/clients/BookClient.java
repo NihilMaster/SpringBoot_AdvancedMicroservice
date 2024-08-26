@@ -5,13 +5,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
-public class UserClient {
+public class BookClient {
 
     @Bean
-    public WebClient webClientUser() {
+    public WebClient webClientBook() {
         return WebClient.builder()
-                .baseUrl("http://localhost:3333")
+                .baseUrl("http://localhost:4444")
                 .build();
     }
-
 }
