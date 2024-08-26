@@ -150,7 +150,6 @@ public class UserHandler {
     public Mono<ServerResponse> updateLoanCount(ServerRequest serverRequest) {
         return userRepository.findById(serverRequest.pathVariable("id"))
                 .flatMap(existingUser -> {
-                        System.out.println(existingUser.toString());
                         existingUser.setLoanCount(serverRequest.pathVariable("count").equals("null") ?
                                 existingUser.getLoanCount() :
                                 Integer.valueOf(serverRequest.pathVariable("count")));

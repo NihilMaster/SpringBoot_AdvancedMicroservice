@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import zzz.master.loans.application.usecasesIMPL.DTOs.UserStatusEumDTO;
 
 @Service
 public class UserService {
@@ -44,6 +45,14 @@ public class UserService {
                 .uri("api/user/{id}/loans-count/{count}", userId, loanCount)
                 .retrieve()
                 .bodyToMono(Integer.class);
+    }
+
+    public Mono<String> updateUserStatus(Long userId, UserStatusEumDTO status) {
+        return webClient
+                .put()
+                .uri("api/user/{id}/status/{status}", userId, status)
+                .retrieve()
+                .bodyToMono(String.class);
     }
 
 }

@@ -6,6 +6,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import zzz.master.loans.application.usecasesIMPL.DTOs.UserStatusEumDTO;
 import zzz.master.loans.domain.models.LoanStatusEnum;
 import zzz.master.loans.infrastructure.adapters.out.clients.BookService;
 import zzz.master.loans.infrastructure.adapters.out.clients.UserService;
@@ -50,7 +51,7 @@ public class LoanHandler {
                             .flatMap(userStatus -> {
                                 return userService.getUserMaxLoansAllowedById(loanEntity.getUserId())
                                         .flatMap(userMaxLoans -> {
-                                            if (userStatus.equals("\"ACTIVE\"") && userMaxLoans > 0) {
+                                            if (userStatus.equals(UserStatusEumDTO.ACTIVE.name()) && userMaxLoans > 0) {
                                                 return bookService.getBookById(loanEntity.getBookId())
                                                         .flatMap(book -> {
                                                             if(book.getAvailableCopies() > 0) {
@@ -87,6 +88,31 @@ public class LoanHandler {
                         })
                         .flatMap(updatedLoan -> ServerResponse.ok().bodyValue(updatedLoan))
                 )
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> updateFinishLoan(ServerRequest serverRequest) {
+        return loanRepository.findById(Long.valueOf(serverRequest.pathVariable("id")))
+                .flatMap(existingLoan -> bookService.getBookById(existingLoan.getBookId())
+                            .flatMap(book -> {
+                                LocalDate returnDate = LocalDate.now();
+                                return userService.updateUserStatus(existingLoan.getUserId(),
+                                                existingLoan.getDueDate().isBefore(returnDate) ?
+                                                        UserStatusEumDTO.SUSPENDED :
+                                                        UserStatusEumDTO.ACTIVE)
+                                        .flatMap(userStatus ->
+                                            bookService.updateBookAvailableCopies(book.getId(), book.getAvailableCopies()-1)
+                                                    .flatMap(bookUpdated -> {
+                                                        existingLoan.setReturnDate(returnDate);
+                                                        if (existingLoan.getDueDate().isBefore(returnDate)) {
+                                                            existingLoan.setStatus(LoanStatusEnum.OVERDUE);
+                                                        } else {
+                                                            existingLoan.setStatus(LoanStatusEnum.RETURNED);
+                                                        }
+                                                        return loanRepository.save(existingLoan)
+                                                                .flatMap(loanSaved -> ServerResponse.ok().bodyValue(loanSaved));
+                                                    }));
+                            }))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
