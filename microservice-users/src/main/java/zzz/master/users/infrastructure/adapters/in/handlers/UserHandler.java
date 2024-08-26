@@ -1,21 +1,35 @@
 package zzz.master.users.infrastructure.adapters.in.handlers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import zzz.master.users.application.usercasesIMPL.DTOs.LoanDTO;
 import zzz.master.users.domain.models.UserStatusEnum;
+import zzz.master.users.infrastructure.adapters.out.client.LoanService;
 import zzz.master.users.infrastructure.adapters.out.repositories.UserRepository;
 import zzz.master.users.infrastructure.entities.UserEntity;
 
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class UserHandler {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private final LoanService loanService;
+
+    public UserHandler(LoanService loanService) {
+        this.loanService = loanService;
+    }
 
     public Mono<ServerResponse> getAll(ServerRequest serverRequest) {
         return ServerResponse.ok().body(userRepository.findAll(), UserEntity.class);
@@ -38,6 +52,53 @@ public class UserHandler {
                 .flatMap(user -> ServerResponse.ok().bodyValue(user.getMaxLoansAllowed()))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
+
+    public Mono<ServerResponse> getLoansForUser(ServerRequest serverRequest) {
+        return userRepository.findById(serverRequest.pathVariable("id")).
+                flatMap(user -> {
+                    Flux<LoanDTO> loans = loanService.getLoansByUserId(Long.valueOf(user.getId()));
+                    return ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(loans, LoanDTO.class);
+                }).switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> getActiveLoansForUser(ServerRequest serverRequest) {
+        return userRepository.findById(serverRequest.pathVariable("id"))
+                .flatMap(user -> {
+                    Flux<LoanDTO> loans = loanService.getLoansByUserId(Long.valueOf(user.getId()))
+                            .filter(loan -> Objects.equals(loan.getStatus(), "ACTIVE"));
+                    return ServerResponse.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(loans, LoanDTO.class);
+                }).switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> getUserRate(ServerRequest serverRequest) {
+        return userRepository.findById(serverRequest.pathVariable("id"))
+                .flatMap(user -> {
+                    return loanService.getLoansByUserId(Long.valueOf(user.getId()))
+                            .collectList()
+                            .flatMap(loans -> {
+                                int rate = loans.stream()
+                                        .mapToInt(loan -> {
+                                            int loanRate = 0;
+                                            LocalDate localDate = LocalDate.now();
+                                            if (loan.getStatus().equals("RETURNED")) {
+                                                loanRate += 1;
+                                            } else if (loan.getStatus().equals("SUSPENDED")) {
+                                                loanRate -= 10;
+                                            }
+                                            loanRate += (localDate.getYear() - loan.getLoanDate().getYear()) * 10;
+                                            return Math.max(loanRate, 0);
+                                        })
+                                        .sum();
+                                return ServerResponse.ok().bodyValue(rate);
+                            });
+                })
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
 
     public Mono<ServerResponse> createUser(ServerRequest serverRequest) {
         return serverRequest

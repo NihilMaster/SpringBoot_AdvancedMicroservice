@@ -10,6 +10,7 @@ public interface LoanRepositoryPort {
     LoanModel createLoan(LoanModel loanModel);
     List<LoanModel> getAllLoans();
     Optional<LoanModel> getLoanById(Long loanId);
+    Optional<List<LoanModel>> getLoansFromUserById(Long userId);
     Optional<LoanModel> updateLoan(LoanModel loanModel);
     boolean deleteLoan(Long loanId);
 }

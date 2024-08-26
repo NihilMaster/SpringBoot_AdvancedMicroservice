@@ -16,6 +16,7 @@ public class LoanRouter {
                 .route()
                 .GET("/api/loans", loanHandler::getAll)
                 .GET("/api/loan/{id}", loanHandler::getById)
+                .GET("/api/loans/user/{id}", loanHandler::getAllFromUserById)
                 .POST("/api/loan", loanHandler::createLoan)
                 .PUT("/api/loan/{id}", loanHandler::updateLoan)
                 .DELETE("/api/loan/{id}", loanHandler::deleteLoan)

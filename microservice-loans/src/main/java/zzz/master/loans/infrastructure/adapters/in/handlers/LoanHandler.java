@@ -4,9 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import zzz.master.loans.infrastructure.adapters.out.repositories.LoanRepository;
 import zzz.master.loans.infrastructure.entities.LoanEntity;
+
+import java.util.List;
 
 @Repository
 public class LoanHandler {
@@ -21,6 +24,13 @@ public class LoanHandler {
     public Mono<ServerResponse> getById(ServerRequest serverRequest) {
         return loanRepository.findById(Long.valueOf(serverRequest.pathVariable("id")))
                 .flatMap(loan -> ServerResponse.ok().bodyValue(loan))
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> getAllFromUserById(ServerRequest serverRequest) {
+        Flux<LoanEntity> loans = loanRepository.findAllByUserId(Long.valueOf(serverRequest.pathVariable("id")));
+        System.out.println(loans);
+        return ServerResponse.ok().body(loans, LoanEntity.class)
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 

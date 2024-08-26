@@ -39,6 +39,11 @@ public class LoanService implements RetrieveLoanUseCase, CreateLoanUseCase, Upda
     }
 
     @Override
+    public Optional<List<LoanModel>> getLoansFromUserById(Long userId) {
+        return retrieveLoanUseCase.getLoansFromUserById(userId);
+    }
+
+    @Override
     public boolean deleteLoan(Long loanId) {
         return deleteLoanUseCase.deleteLoan(loanId);
     }

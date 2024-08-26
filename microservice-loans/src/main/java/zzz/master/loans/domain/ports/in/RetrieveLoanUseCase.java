@@ -9,4 +9,5 @@ public interface RetrieveLoanUseCase {
 
     List<LoanModel> getAllLoans();
     Optional<LoanModel> getLoanById(Long id);
+    Optional<List<LoanModel>> getLoansFromUserById(Long userId);
 }

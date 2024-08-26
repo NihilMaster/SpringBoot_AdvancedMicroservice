@@ -24,4 +24,9 @@ public class RetrieveLoanUseCaseIMPL implements RetrieveLoanUseCase {
     public Optional<LoanModel> getLoanById(Long id) {
         return loanRepositoryPort.getLoanById(id);
     }
+
+    @Override
+    public Optional<List<LoanModel>> getLoansFromUserById(Long userId) {
+        return loanRepositoryPort.getLoansFromUserById(userId);
+    }
 }
