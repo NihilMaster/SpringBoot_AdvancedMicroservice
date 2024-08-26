@@ -21,6 +21,7 @@ public class UserRouter {
                 .GET("/api/user/{id}/loans", userHandler::getLoansForUser)
                 .GET("/api/user/{id}/loans-active", userHandler::getActiveLoansForUser)
                 .GET("/api/user/{id}/rate", userHandler::getUserRate)
+                .GET("/api/user/{id}/loans-count", userHandler::getUserLoanCount)
                 .POST("/api/user", userHandler::createUser)
                 .PUT("/api/user/{id}", userHandler::updateUser)
                 .PUT("/api/user/{id}/status/{status}", userHandler::updateUserStatus)

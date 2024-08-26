@@ -99,6 +99,14 @@ public class UserHandler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> getUserLoanCount(ServerRequest serverRequest) {
+        return userRepository.findById(serverRequest.pathVariable("id"))
+                .flatMap(user -> {
+                    return ServerResponse.ok().bodyValue(user.getLoanCount());
+                })
+                .switchIfEmpty(ServerResponse.ok().bodyValue(0));
+    }
+
 
     public Mono<ServerResponse> createUser(ServerRequest serverRequest) {
         return serverRequest
