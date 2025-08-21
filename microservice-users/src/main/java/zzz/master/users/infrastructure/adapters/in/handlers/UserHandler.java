@@ -1,6 +1,7 @@
 package zzz.master.users.infrastructure.adapters.in.handlers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -107,6 +108,13 @@ public class UserHandler {
                 .switchIfEmpty(ServerResponse.ok().bodyValue(0));
     }
 
+    public Mono<ServerResponse> getUserByEmail(ServerRequest serverRequest){
+        return serverRequest.queryParam("term")
+                .map(term -> userRepository.findUserByEmail(term)
+                        .flatMap(user -> ServerResponse.ok().bodyValue(user))
+                        .switchIfEmpty(ServerResponse.notFound().build()))
+                .orElseGet(() -> ServerResponse.badRequest().bodyValue("Missing required query parameter: term"));
+    }
 
     public Mono<ServerResponse> createUser(ServerRequest serverRequest) {
         return serverRequest

@@ -14,13 +14,24 @@ public class LoanRouter {
     public RouterFunction<ServerResponse> loanRoutes(LoanHandler loanHandler) {
         return RouterFunctions
                 .route()
-                .GET("/api/loans", loanHandler::getAll)
-                .GET("/api/loan/{id}", loanHandler::getById)
-                .GET("/api/loans/user/{id}", loanHandler::getAllFromUserById)
-                .POST("/api/loan", loanHandler::createLoan)
-                .PUT("/api/loan/{id}", loanHandler::updateLoan)
-                .PUT("/api/loan/finish/{id}", loanHandler::updateFinishLoan)
-                .DELETE("/api/loan/{id}", loanHandler::deleteLoan)
+                .path("/api", builder -> builder
+                        .path("/loans", loansBuilder -> loansBuilder
+                                .GET("", loanHandler::getAll)          // /api/loans
+                                .GET("/", loanHandler::getAll)         // /api/loans/
+                                .GET("/user/{id}", loanHandler::getAllFromUserById)
+                                .GET("/active/", loanHandler::getAllActive)
+                                .GET("/overdue/", loanHandler::getAllOverdue)
+                                .GET("/returned/", loanHandler::getAllReturned)
+                        )
+                        .path("/loan", loanBuilder -> loanBuilder
+                                .GET("/{id}", loanHandler::getById)
+                                .POST("", loanHandler::createLoan)                    // /api/loan
+                                .POST("/", loanHandler::createLoan)                   // /api/loan/
+                                .PUT("/{id}", loanHandler::updateLoan)
+                                .PUT("/{id}/finish", loanHandler::updateFinishLoan)
+                                .DELETE("/{id}", loanHandler::deleteLoan)
+                        )
+                )
                 .build();
     }
 }

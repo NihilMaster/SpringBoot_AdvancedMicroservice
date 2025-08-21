@@ -37,6 +37,18 @@ public class LoanHandler {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
+    public Mono<ServerResponse> getAllActive(ServerRequest serverRequest){
+        return ServerResponse.ok().body(loanRepository.findAllActive(), LoanEntity.class);
+    }
+
+    public Mono<ServerResponse> getAllOverdue(ServerRequest serverRequest){
+        return ServerResponse.ok().body(loanRepository.findAllOverdue(), LoanEntity.class);
+    }
+
+    public Mono<ServerResponse> getAllReturned(ServerRequest serverRequest){
+        return ServerResponse.ok().body(loanRepository.findAllReturned(), LoanEntity.class);
+    }
+
     public Mono<ServerResponse> getAllFromUserById(ServerRequest serverRequest) {
         Flux<LoanEntity> loans = loanRepository.findAllByUserId(Long.valueOf(serverRequest.pathVariable("id")));
         System.out.println(loans);

@@ -1,6 +1,7 @@
 package zzz.master.books.infrastructure.adapters.in.handlers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -22,6 +23,22 @@ public class BookHandler {
         return bookRepository.findById(Long.valueOf(serverRequest.pathVariable("id")))
                 .flatMap(book -> ServerResponse.ok().bodyValue(book))
                 .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> getBooksWithAvailableCopiesGreaterThan(ServerRequest serverRequest){
+        Integer than = 0;
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(bookRepository.findByAvailableCopiesGreaterThan(than), BookEntity.class)
+                .switchIfEmpty(ServerResponse.notFound().build());
+    }
+
+    public Mono<ServerResponse> getBooksByAuthor(ServerRequest serverRequest){
+        return serverRequest.queryParam("author")
+                .map(author -> bookRepository.findBookByAuthor(author)
+                        .collectList()
+                        .flatMap(books -> ServerResponse.ok().bodyValue(books)
+                                .switchIfEmpty(ServerResponse.notFound().build())))
+                .orElse(ServerResponse.badRequest().bodyValue("Author parameter is required"));
     }
 
     public Mono<ServerResponse> createBook(ServerRequest serverRequest) {

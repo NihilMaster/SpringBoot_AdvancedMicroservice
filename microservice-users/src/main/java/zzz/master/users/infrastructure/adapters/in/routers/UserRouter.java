@@ -14,20 +14,29 @@ public class UserRouter {
     public RouterFunction<ServerResponse> userRoutes(UserHandler userHandler) {
         return RouterFunctions
                 .route()
-                .GET("/api/users", userHandler::getAll)
-                .GET("/api/user/{id}", userHandler::getById)
-                .GET("/api/user/{id}/status", userHandler::getUserStatus)
-                .GET("/api/user/{id}/max-loans-allowed", userHandler::getMaxLoansAllowed)
-                .GET("/api/user/{id}/loans", userHandler::getLoansForUser)
-                .GET("/api/user/{id}/loans-active", userHandler::getActiveLoansForUser)
-                .GET("/api/user/{id}/rate", userHandler::getUserRate)
-                .GET("/api/user/{id}/loans-count", userHandler::getUserLoanCount)
-                .POST("/api/user", userHandler::createUser)
-                .PUT("/api/user/{id}", userHandler::updateUser)
-                .PUT("/api/user/{id}/status/{status}", userHandler::updateUserStatus)
-                .PUT("/api/user/{id}/loans-count/{count}", userHandler::updateLoanCount)
-                .PUT("/api/user/{id}/max-loans-allowed/{max}", userHandler::updateMaxLoansAllowed)
-                .DELETE("/api/user/{id}", userHandler::deleteUser)
+                .path("/api", builder -> builder
+                        .path("/users", usersBuilder -> usersBuilder
+                                .GET("", userHandler::getAll)          // /api/users
+                                .GET("/", userHandler::getAll)         // /api/users/
+                        )
+                        .path("/user", userBuilder -> userBuilder
+                                .GET("/{id}", userHandler::getById)
+                                .GET("/{id}/status", userHandler::getUserStatus)
+                                .GET("/{id}/max-loans-allowed", userHandler::getMaxLoansAllowed)
+                                .GET("/{id}/loans", userHandler::getLoansForUser)
+                                .GET("/{id}/loans-active", userHandler::getActiveLoansForUser)
+                                .GET("/{id}/rate", userHandler::getUserRate)
+                                .GET("/{id}/loans-count", userHandler::getUserLoanCount)
+                                .GET("/by-email/", userHandler::getUserByEmail)
+                                .POST("", userHandler::createUser)                    // /api/user
+                                .POST("/", userHandler::createUser)                   // /api/user/
+                                .PUT("/{id}", userHandler::updateUser)
+                                .PUT("/{id}/status/{status}", userHandler::updateUserStatus)
+                                .PUT("/{id}/loans-count/{count}", userHandler::updateLoanCount)
+                                .PUT("/{id}/max-loans-allowed/{max}", userHandler::updateMaxLoansAllowed)
+                                .DELETE("/{id}", userHandler::deleteUser)
+                        )
+                )
                 .build();
     }
 }

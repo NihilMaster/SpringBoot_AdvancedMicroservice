@@ -14,14 +14,25 @@ public class BookRouter {
     public RouterFunction<ServerResponse> bookRoutes(BookHandler bookHandler) {
         return RouterFunctions
                 .route()
-                .GET("/api/books", bookHandler::getAll)
-                .GET("/api/book/{id}", bookHandler::getById)
-                .POST("/api/book", bookHandler::createBook)
-                .PUT("/api/book/{id}", bookHandler::updateBook)
-                .PUT("/api/book/{id}/availability-copies/{availability}", bookHandler::updateAvailability)
-                .PUT("/api/book/{id}/total-copies/{copies}", bookHandler::updateTotalCopies)
-                .PUT("/api/book/{id}/loan-count/{count}", bookHandler::updateLoanCount)
-                .DELETE("/api/book/{id}", bookHandler::deleteBook)
+                .path("/api", builder -> builder
+                        .path("/books", booksBuilder -> booksBuilder
+                                .GET("", bookHandler::getAll)          // /api/books
+                                .GET("/", bookHandler::getAll)         // /api/books/
+                                .GET("/available", bookHandler::getBooksWithAvailableCopiesGreaterThan)
+                                .GET("/by-author/",bookHandler::getBooksByAuthor)
+                        )
+                        .path("/book", bookBuilder -> bookBuilder
+                                .GET("/{id}", bookHandler::getById)
+                                // .GET("/{id}/loan-count", bookHandler::getLoanCount)
+                                .POST("", bookHandler::createBook)                    // /api/book
+                                .POST("/", bookHandler::createBook)                   // /api/book/
+                                .PUT("/{id}", bookHandler::updateBook)
+                                .PUT("/{id}/availability-copies/{availability}", bookHandler::updateAvailability)
+                                .PUT("/{id}/total-copies/{copies}", bookHandler::updateTotalCopies)
+                                .PUT("/{id}/loan-count/{count}", bookHandler::updateLoanCount)
+                                .DELETE("/{id}", bookHandler::deleteBook)
+                        )
+                )
                 .build();
     }
 }
